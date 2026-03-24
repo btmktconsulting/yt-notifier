@@ -88,7 +88,9 @@ def fetch_video_description(video_id: str) -> str | None:
     """Scrape the video description from the YouTube page."""
     url = f"https://www.youtube.com/watch?v={video_id}"
     try:
-        resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+        resp = requests.get(url, timeout=15, headers={
+            "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+        })
         resp.raise_for_status()
     except requests.RequestException as e:
         print(f"[ERROR] Could not fetch video page: {e}")
@@ -103,8 +105,10 @@ def fetch_video_description(video_id: str) -> str | None:
         # Trim to first ~300 chars for a concise summary
         if len(desc) > 300:
             desc = desc[:300].rsplit(" ", 1)[0] + "..."
+        print(f"[OK] Fetched summary for video {video_id}")
         return desc
 
+    print(f"[WARN] Could not extract description for video {video_id}")
     return None
 
 
