@@ -1,0 +1,45 @@
+name: Check YouTube Uploads
+
+on:
+  schedule:
+    # Check every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Restore state
+        uses: actions/cache/restore@v4
+        with:
+          path: last_video_ids.json
+          key: yt-state-${{ github.run_id }}
+          restore-keys: |
+            yt-state-
+
+      - name: Check for new videos
+        env:
+          BADFRIENDS_HANDLE: ${{ vars.BADFRIENDS_HANDLE }}
+          BADFRIENDS_DISCORD_WEBHOOK: ${{ secrets.BADFRIENDS_DISCORD_WEBHOOK }}
+          SMEEDIA_HANDLE: ${{ vars.SMEEDIA_HANDLE }}
+          SMEEDIA_DISCORD_WEBHOOK: ${{ secrets.SMEEDIA_DISCORD_WEBHOOK }}
+        run: python main.py
+
+      - name: Save state
+        uses: actions/cache/save@v4
+        with:
+          path: last_video_ids.json
+          key: yt-state-${{ github.run_id }}
