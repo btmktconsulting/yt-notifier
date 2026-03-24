@@ -173,7 +173,12 @@ def main():
         video_id, title, url = result
         last_id = state.get(name)
 
-        if last_id is None or video_id != last_id:
+        if last_id is None:
+            print(f"[INIT] First run for {name}. Saving latest without notifying: {title}")
+            state[name] = video_id
+            continue
+
+        if video_id != last_id:
             print(f"[NEW] {name}: {title} — {url}")
 
             summary = None
