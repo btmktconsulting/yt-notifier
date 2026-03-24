@@ -32,9 +32,7 @@ jobs:
 
       - name: Check for new videos
         env:
-          BADFRIENDS_HANDLE: ${{ vars.BADFRIENDS_HANDLE }}
           BADFRIENDS_DISCORD_WEBHOOK: ${{ secrets.BADFRIENDS_DISCORD_WEBHOOK }}
-          SMEEDIA_HANDLE: ${{ vars.SMEEDIA_HANDLE }}
           SMEEDIA_DISCORD_WEBHOOK: ${{ secrets.SMEEDIA_DISCORD_WEBHOOK }}
         run: python main.py
 

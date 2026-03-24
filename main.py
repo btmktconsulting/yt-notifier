@@ -13,17 +13,17 @@ import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-# Each channel config: handle, discord webhook, and whether to include a summary
+# Each channel config: channel ID, discord webhook, and whether to include a summary
 CHANNELS = [
     {
         "name": "Bad Friends",
-        "handle": os.environ.get("BADFRIENDS_HANDLE", "@BadFriends"),
+        "channel_id": os.environ.get("BADFRIENDS_CHANNEL_ID", "UCRBpynZV0b7ww2XMCfC17qg"),
         "webhook": os.environ.get("BADFRIENDS_DISCORD_WEBHOOK", ""),
         "include_summary": False,
     },
     {
         "name": "Smeedia",
-        "handle": os.environ.get("SMEEDIA_HANDLE", "@Smeedia"),
+        "channel_id": os.environ.get("SMEEDIA_CHANNEL_ID", "UC6suAIZxy1WbCquJosUWtWQ"),
         "webhook": os.environ.get("SMEEDIA_DISCORD_WEBHOOK", ""),
         "include_summary": True,
     },
@@ -159,11 +159,8 @@ def main():
             print(f"[SKIP] No webhook configured for {name}")
             continue
 
-        print(f"[CHECK] {name} ({channel['handle']})")
-
-        channel_id = resolve_channel_id(channel["handle"])
-        if not channel_id:
-            continue
+        channel_id = channel["channel_id"]
+        print(f"[CHECK] {name} (channel: {channel_id})")
 
         result = fetch_latest_video(channel_id)
         if result is None:
@@ -172,12 +169,7 @@ def main():
         video_id, title, url = result
         last_id = state.get(name)
 
-        if last_id is None:
-            print(f"[INIT] First run for {name}. Saving latest without notifying: {title}")
-            state[name] = video_id
-            continue
-
-        if video_id != last_id:
+        if last_id is None or video_id != last_id:
             print(f"[NEW] {name}: {title} — {url}")
 
             summary = None
